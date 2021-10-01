@@ -1,7 +1,7 @@
 ﻿using Structurizr;
 using Structurizr.Api;
 
-namespace fas_c4_model
+namespace nutrix_c4_model
 {
     class Program
     {
@@ -12,9 +12,9 @@ namespace fas_c4_model
 
         static void Generator()
         {
-            const long workspaceId = 69571;
-            const string apiKey = "20a089aa-1019-46e8-8b5e-d1b41c04a668";
-            const string apiSecret = "b50b6ee7-6206-4e91-9170-b17ef8b63598";
+            const long workspaceId = 69868;
+            const string apiKey = "39bb634b-5f5d-4363-9fdf-33aa689a4ce0";
+            const string apiSecret = "8b4522e1-46ff-4ccd-aab8-5962a4764e7f";
 
             StructurizrClient structurizrClient = new StructurizrClient(apiKey, apiSecret);
             Workspace workspace = new Workspace("Nutrix C4 Model - Sistema de Videollamadas", "Sistema de Videollamadas para asesorías virtuales con nutricionistas");
@@ -39,7 +39,6 @@ namespace fas_c4_model
 
             // 1. Diagrama de Contexto
             SystemContextView contextView = viewSet.CreateSystemContextView(videocallSystem, "Contexto", "Diagrama de contexto");
-            contextView.PaperSize = PaperSize.A4_Landscape;
             contextView.AddAllSoftwareSystems();
             contextView.AddAllPeople();
 
@@ -66,26 +65,12 @@ namespace fas_c4_model
             Container appointmentContext = videocallSystem.AddContainer("Appointment Context", "Bounded Context del Microservicio de Appointments", "Spring Boot port 8081");
             Container patientContext = videocallSystem.AddContainer("Patient Context", "Bounded Context del Microservicio de Pacientes", "Spring Boot port 8082");
             Container nutritionistContext = videocallSystem.AddContainer("Nutritionist Context", "Bounded Context del Microservicio de Nutricionistas", "Spring Boot port 8083");
-            Container recipeContext = videocallSystem.AddContainer("Recipe Context", "Bounded Context del Microservicio de Recetas", "Spring Boot port 8084");
-            Container dietContext = videocallSystem.AddContainer("Diet Context", "Bounded Context del Microservicio de Dietas", "Spring Boot port 8085");
-            Container recommendationsContext = videocallSystem.AddContainer("Recommendations Context", "Bounded Context del Microservicio de Recomendaciones", "Spring Boot port 8086");
-            Container specialtyContext = videocallSystem.AddContainer("Specialty Context", "Bounded Context del Microservicio de Especialidades", "Spring Boot port 8087");
-            Container paymentContext = videocallSystem.AddContainer("Payment Context", "Bounded Context del Microservicio de Payments", "Spring Boot port 8088");
-            Container professionalProfileContext = videocallSystem.AddContainer("Professional Profile Context", "Bounded Context del Microservicio de Professional Profiles", "Spring Boot port 8089");
-            Container authenticationContext = videocallSystem.AddContainer("Authentication Context", "Bounded Context del Microservicio que gestiona la identidad de los usuarios", "Spring Boot port 8090");
-            Container billingContext = videocallSystem.AddContainer("Billing Context", "Bounded Context del Microservicio de Billings", "Spring Boot port 8091");
+            Container publicationsContext = videocallSystem.AddContainer("Publications Context", "Bounded Context del Microservicio de Publicaciones", "Spring Boot port 8084");
             Container messageBus = videocallSystem.AddContainer("Bus de Mensajes en Cluster de Alta Disponibilidad", "Transporte de eventos del dominio.", "RabbitMQ");
-            Container appointmentContextDatabase = videocallSystem.AddContainer("Appointment Context DB", "", "Oracle");
-            Container patientContextDatabase = videocallSystem.AddContainer("Patient Context DB", "", "Oracle");
-            Container nutritionistContextDatabase = videocallSystem.AddContainer("Nutritionist Context DB", "", "Oracle");
-            Container recipeContextDatabase = videocallSystem.AddContainer("Recipe Context DB", "", "Oracle");
-            Container dietContextDatabase = videocallSystem.AddContainer("Diet Context DB", "", "Oracle");
-            Container recommendationsContextDatabase = videocallSystem.AddContainer("Recommendation Context DB", "", "Oracle");
-            Container specialtyContextDatabase = videocallSystem.AddContainer("Specialty Context DB", "", "Oracle");
-            Container paymentContextDatabase = videocallSystem.AddContainer("Payment Context DB", "", "Oracle");
-            Container professionalProfileContextDatabase = videocallSystem.AddContainer("ProfessionalProfile Context DB", "", "Oracle");
-            Container authenticationContextDatabase = videocallSystem.AddContainer("Authentica Context DB", "", "Oracle");
-            Container billingContextDatabase = videocallSystem.AddContainer("Airport Context DB", "", "Oracle");
+            Container appointmentContextDatabase = videocallSystem.AddContainer("Appointment Context DB", "", "PostgreSQL");
+            Container patientContextDatabase = videocallSystem.AddContainer("Patient Context DB", "", "PostgreSQL");
+            Container nutritionistContextDatabase = videocallSystem.AddContainer("Nutritionist Context DB", "", "PostgreSQL");
+            Container publicationsContextDatabase = videocallSystem.AddContainer("Publications Context DB", "", "PostgreSQL");
 
             patient.Uses(webApplication, "Consulta");
             patient.Uses(landingPage, "Consulta");
@@ -98,50 +83,22 @@ namespace fas_c4_model
             apiGateway.Uses(appointmentContext, "API Request", "JSON/HTTPS");
             apiGateway.Uses(patientContext, "API Request", "JSON/HTTPS");
             apiGateway.Uses(nutritionistContext, "API Request", "JSON/HTTPS");
-            apiGateway.Uses(recipeContext, "API Request", "JSON/HTTPS");
-            apiGateway.Uses(dietContext, "API Request", "JSON/HTTPS");
-            apiGateway.Uses(recommendationsContext, "API Request", "JSON/HTTPS");
-            apiGateway.Uses(specialtyContext, "API Request", "JSON/HTTPS");
-            apiGateway.Uses(paymentContext, "API Request", "JSON/HTTPS");
-            apiGateway.Uses(professionalProfileContext, "API Request", "JSON/HTTPS");
-            apiGateway.Uses(authenticationContext, "API Request", "JSON/HTTPS");
-            apiGateway.Uses(billingContext, "API Request", "JSON/HTTPS");
+            apiGateway.Uses(publicationsContext, "API Request", "JSON/HTTPS");
 
             appointmentContext.Uses(messageBus, "Publica y consume eventos del dominio");
             appointmentContext.Uses(appointmentContextDatabase, "", "JDBC");
             appointmentContext.Uses(agoraAPI, "Permite las videollamadas dentro de la app");
 
             patientContext.Uses(messageBus, "Publica y consume eventos del dominio");
+            patientContext.Uses(niubizAPI, "Permite los pagos dentro de la app");
             patientContext.Uses(patientContextDatabase, "", "JDBC");
 
             nutritionistContext.Uses(messageBus, "Publica y consume eventos del dominio");
             nutritionistContext.Uses(nutritionistContextDatabase, "", "JDBC");
             nutritionistContext.Uses(cnpAPI, "Permite la validación de los datos del nutricionista");
 
-            recipeContext.Uses(messageBus, "Publica y consume eventos del dominio");
-            recipeContext.Uses(recipeContextDatabase, "", "JDBC");
-
-            dietContext.Uses(messageBus, "Publica y consume eventos del dominio");
-            dietContext.Uses(dietContextDatabase, "", "JDBC");
-
-            recommendationsContext.Uses(messageBus, "Publica y consume eventos del dominio");
-            recommendationsContext.Uses(recommendationsContextDatabase, "", "JDBC");
-
-            specialtyContext.Uses(messageBus, "Publica y consume eventos del dominio");
-            specialtyContext.Uses(specialtyContextDatabase, "", "JDBC");
-
-            paymentContext.Uses(messageBus, "Publica y consume eventos del dominio");
-            paymentContext.Uses(paymentContextDatabase, "", "JDBC");
-            paymentContext.Uses(niubizAPI, "Permite los pagos por los servicios ofrecidos");
-
-            professionalProfileContext.Uses(messageBus, "Publica y consume eventos del dominio");
-            professionalProfileContext.Uses(professionalProfileContextDatabase, "", "JDBC");
-
-            authenticationContext.Uses(messageBus, "Publica y consume eventos del dominio");
-            authenticationContext.Uses(authenticationContextDatabase, "", "JDBC");
-
-            billingContext.Uses(messageBus, "Publica y consume eventos del dominio");
-            billingContext.Uses(billingContextDatabase, "", "JDBC");
+            publicationsContext.Uses(messageBus, "Publica y consume eventos del dominio");
+            publicationsContext.Uses(publicationsContextDatabase, "", "JDBC");
 
             // Tags
             webApplication.AddTags("WebApp");
@@ -157,29 +114,8 @@ namespace fas_c4_model
             nutritionistContext.AddTags("NutritionistContext");
             nutritionistContextDatabase.AddTags("NutritionistContextDatabase");
 
-            recipeContext.AddTags("RecipeContext");
-            recipeContextDatabase.AddTags("RecipeContextDatabase");
-
-            dietContext.AddTags("DietContext");
-            dietContextDatabase.AddTags("DietContextDatabase");
-
-            recommendationsContext.AddTags("RecommendationContext");
-            recommendationsContextDatabase.AddTags("RecommendationContextDatabase");
-
-            specialtyContext.AddTags("SpecialtyContext");
-            specialtyContextDatabase.AddTags("SpecialtyContextDatabase");
-
-            paymentContext.AddTags("PaymentContext");
-            paymentContextDatabase.AddTags("PaymentContextDatabase");
-
-            professionalProfileContext.AddTags("ProfessionalProfileContext");
-            professionalProfileContextDatabase.AddTags("ProfessionalProfileContextDatabase");
-
-            authenticationContext.AddTags("AuthenticationContext");
-            authenticationContextDatabase.AddTags("AuthenticationContextDatabase");
-
-            billingContext.AddTags("BillingContext");
-            billingContextDatabase.AddTags("BillingContextDatabase");
+            publicationsContext.AddTags("PublicationsContext");
+            publicationsContextDatabase.AddTags("PublicationsContextDatabase");
 
             messageBus.AddTags("MessageBus");
 
@@ -197,38 +133,105 @@ namespace fas_c4_model
             styles.Add(new ElementStyle("NutritionistContext") { Shape = Shape.Hexagon, Background = "#facc2e", Icon = "" });
             styles.Add(new ElementStyle("NutritionistContextDatabase") { Shape = Shape.Cylinder, Background = "#ff0000", Color = "#ffffff", Icon = "" });
 
-            styles.Add(new ElementStyle("RecipeContext") { Shape = Shape.Hexagon, Background = "#facc2e", Icon = "" });
-            styles.Add(new ElementStyle("RecipeContextDatabase") { Shape = Shape.Cylinder, Background = "#ff0000", Color = "#ffffff", Icon = "" });
-
-            styles.Add(new ElementStyle("DietContext") { Shape = Shape.Hexagon, Background = "#facc2e", Icon = "" });
-            styles.Add(new ElementStyle("DietContextDatabase") { Shape = Shape.Cylinder, Background = "#ff0000", Color = "#ffffff", Icon = "" });
-
-            styles.Add(new ElementStyle("RecommendationContext") { Shape = Shape.Hexagon, Background = "#facc2e", Icon = "" });
-            styles.Add(new ElementStyle("RecommendationContextDatabase") { Shape = Shape.Cylinder, Background = "#ff0000", Color = "#ffffff", Icon = "" });
-
-            styles.Add(new ElementStyle("SpecialtyContext") { Shape = Shape.Hexagon, Background = "#facc2e", Icon = "" });
-            styles.Add(new ElementStyle("SpecialtyContextDatabase") { Shape = Shape.Cylinder, Background = "#ff0000", Color = "#ffffff", Icon = "" });
-
-            styles.Add(new ElementStyle("PaymentContext") { Shape = Shape.Hexagon, Background = "#facc2e", Icon = "" });
-            styles.Add(new ElementStyle("PaymentContextDatabase") { Shape = Shape.Cylinder, Background = "#ff0000", Color = "#ffffff", Icon = "" });
-
-            styles.Add(new ElementStyle("ProfessionalProfileContext") { Shape = Shape.Hexagon, Background = "#facc2e", Icon = "" });
-            styles.Add(new ElementStyle("ProfessionalProfileContextDatabase") { Shape = Shape.Cylinder, Background = "#ff0000", Color = "#ffffff", Icon = "" });
-
-            styles.Add(new ElementStyle("AuthenticationContext") { Shape = Shape.Hexagon, Background = "#facc2e", Icon = "" });
-            styles.Add(new ElementStyle("AuthenticationContextDatabase") { Shape = Shape.Cylinder, Background = "#ff0000", Color = "#ffffff", Icon = "" });
-
-            styles.Add(new ElementStyle("BillingContext") { Shape = Shape.Hexagon, Background = "#facc2e", Icon = "" });
-            styles.Add(new ElementStyle("BillingContextDatabase") { Shape = Shape.Cylinder, Background = "#ff0000", Color = "#ffffff", Icon = "" });
-
+            styles.Add(new ElementStyle("PublicationsContext") { Shape = Shape.Hexagon, Background = "#facc2e", Icon = "" });
+            styles.Add(new ElementStyle("PublicationsContextDatabase") { Shape = Shape.Cylinder, Background = "#ff0000", Color = "#ffffff", Icon = "" });
 
             styles.Add(new ElementStyle("MessageBus") { Width = 850, Background = "#fd8208", Color = "#ffffff", Shape = Shape.Pipe, Icon = "" });
 
             ContainerView containerView = viewSet.CreateContainerView(videocallSystem, "Contenedor", "Diagrama de contenedores");
-            contextView.PaperSize = PaperSize.A4_Landscape;
-            containerView.PaperSize = PaperSize.A3_Landscape;
             containerView.AddAllElements();
 
+            // 3. Diagrama de componentes
+            //Component patientsController = patientContext.AddComponent("Patients Controller", "REST API endpoints de patients", "Spring Boot REST Controller");
+            //Component billsController = patientContext.AddComponent("Bills Controller", "REST API endpoints de bills", "Spring Boot REST Controller");
+            //Component paymentMethodsController = patientContext.AddComponent("Payment Methods Controller", "REST API endpoints de bills", "Spring Boot REST Controller");
+            Component patientsCommandController = patientContext.AddComponent("Patients Command Controller", "REST API endpoints de patients", "Spring Boot REST Controller");
+            Component patientsQueryController = patientContext.AddComponent("Patients Query Controller", "Permite a los pacientes acceder a su perfil y datos", "Spring Component");
+            Component billsCommandController = patientContext.AddComponent("Bills Command Controller", "REST API endpoints de bills", "Spring Boot REST Controller");
+            Component billsQueryController = patientContext.AddComponent("Bills Query Controller", "Permite acceder a los datos de bills", "Spring Component");
+            Component paymentMethodsCommandController = patientContext.AddComponent("PaymentMethods Command Controller", "REST API endpoints de payment methods", "Spring Boot REST Controller");
+            Component paymentMethodsQueryController = patientContext.AddComponent("PaymentMethods Query Controller", "Permite acceder a los datos de payment methods", "Spring Component");
+            Component patientsApplicationService = patientContext.AddComponent("Patients Application Service","Provee métodos para los patients", "Spring Component");
+            Component domainLayer = patientContext.AddComponent("Domain Layer","","Spring Component");
+            Component patientRepository = patientContext.AddComponent("Patient Repository","Información de los patients", "Spring Component");
+            Component billRepository = patientContext.AddComponent("Bill Repository", "Información de los bills", "Spring Component");
+            Component paymentMethodRepository = patientContext.AddComponent("PaymentMethod Repository", "Información de los payment methods", "Spring Component");
+
+            // Tags
+            //patientsController.AddTags("PatientsController");
+            //billsController.AddTags("BillsController");
+            //paymentMethodsController.AddTags("PaymentMethodsController");
+            patientsCommandController.AddTags("PatientsCommandController");
+            patientsQueryController.AddTags("PatientsQueryController");
+            billsCommandController.AddTags("BillsCommandController");
+            billsQueryController.AddTags("BillsQueryController");
+            paymentMethodsCommandController.AddTags("PaymentMethodsCommandController");
+            paymentMethodsQueryController.AddTags("PaymentMethodsQueryController");
+            patientsApplicationService.AddTags("PatientsApplicationService");
+            domainLayer.AddTags("DomainLayer");
+            patientRepository.AddTags("PatientRepository");
+            billRepository.AddTags("BillRepository");
+            paymentMethodRepository.AddTags("PaymentMethodRepository");
+
+            //styles.Add(new ElementStyle("PatientsController") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            //styles.Add(new ElementStyle("BillsController") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            //styles.Add(new ElementStyle("PaymentMethodsController") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            styles.Add(new ElementStyle("PatientsCommandController") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            styles.Add(new ElementStyle("PatientsQueryController") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            styles.Add(new ElementStyle("BillsCommandController") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            styles.Add(new ElementStyle("BillsQueryController") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            styles.Add(new ElementStyle("PaymentMethodsCommandController") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            styles.Add(new ElementStyle("PaymentMethodsQueryController") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            styles.Add(new ElementStyle("PatientsApplicationService") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            styles.Add(new ElementStyle("DomainLayer") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            styles.Add(new ElementStyle("PatientRepository") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            styles.Add(new ElementStyle("BillRepository") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            styles.Add(new ElementStyle("PaymentMethodRepository") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+
+            //apiGateway.Uses(patientsController, "", "JSON/HTTPS");
+            //apiGateway.Uses(billsController, "", "JSON/HTTPS");
+            //apiGateway.Uses(paymentMethodsController, "", "JSON/HTTPS");
+            apiGateway.Uses(patientsCommandController, "", "JSON/HTTPS");
+            apiGateway.Uses(patientsQueryController, "", "JSON/HTTPS");
+            apiGateway.Uses(billsCommandController, "", "JSON/HTTPS");
+            apiGateway.Uses(billsQueryController, "", "JSON/HTTPS");
+            apiGateway.Uses(paymentMethodsCommandController, "", "JSON/HTTPS");
+            apiGateway.Uses(paymentMethodsQueryController, "", "JSON/HTTPS");
+            webApplication.Uses(apiGateway, "API Request", "JSON/HTTPS");
+
+            //patientsController.Uses(patientsApplicationService, "Invoca métodos de patients", "");
+            //billsController.Uses(patientsApplicationService, "Invoca métodos de bills", "");
+            //paymentMethodsController.Uses(patientsApplicationService, "Invoca métodos de payment methods", "");
+            patientsCommandController.Uses(patientsApplicationService, "Invoca métodos de patients", "");
+            patientsQueryController.Uses(patientsApplicationService, "Invoca métodos de patients", "");
+            billsCommandController.Uses(patientsApplicationService, "Invoca métodos de bills", "");
+            billsQueryController.Uses(patientsApplicationService, "Invoca métodos de bills", "");
+            paymentMethodsCommandController.Uses(patientsApplicationService, "Invoca métodos de payment methods", "");
+            paymentMethodsQueryController.Uses(patientsApplicationService, "Invoca métodos de payment methods", "");
+
+            patientsApplicationService.Uses(domainLayer, "Usa", "");
+            patientsApplicationService.Uses(patientRepository, "", "JDBC");
+            patientsApplicationService.Uses(billRepository, "", "JDBC");
+            patientsApplicationService.Uses(paymentMethodRepository, "", "JDBC");
+
+            billRepository.Uses(niubizAPI, "", "JSON/HTTPS");
+            patientRepository.Uses(patientContextDatabase, "", "JDBC");
+            billRepository.Uses(patientContextDatabase, "", "JDBC");
+            paymentMethodRepository.Uses(patientContextDatabase, "", "JDBC");
+
+            ComponentView componentView = viewSet.CreateComponentView(patientContext, "Components", "Component Diagram");
+            componentView.Add(webApplication);
+            componentView.Add(apiGateway);
+            componentView.Add(patientContextDatabase);
+            componentView.Add(niubizAPI);
+            componentView.AddAllComponents();
+
+            // Configuraciones de la vista
+            contextView.PaperSize = PaperSize.A5_Landscape;
+            containerView.PaperSize = PaperSize.A3_Landscape;
+            componentView.PaperSize = PaperSize.A4_Landscape;
+
+            // Actualizar Workspace
             structurizrClient.UnlockWorkspace(workspaceId);
             structurizrClient.PutWorkspace(workspaceId, workspace);
         }

@@ -141,10 +141,10 @@ namespace nutrix_c4_model
             ContainerView containerView = viewSet.CreateContainerView(videocallSystem, "Contenedor", "Diagrama de contenedores");
             containerView.AddAllElements();
 
-            // 3. Diagrama de componentes
-            //Component patientsController = patientContext.AddComponent("Patients Controller", "REST API endpoints de patients", "Spring Boot REST Controller");
-            //Component billsController = patientContext.AddComponent("Bills Controller", "REST API endpoints de bills", "Spring Boot REST Controller");
-            //Component paymentMethodsController = patientContext.AddComponent("Payment Methods Controller", "REST API endpoints de bills", "Spring Boot REST Controller");
+            // 3. Diagrama de componentes patient
+
+            ComponentView componentViewPatient = viewSet.CreateComponentView(patientContext, "ComponentsPatient", "Component Diagram");
+
             Component patientsCommandController = patientContext.AddComponent("Patients Command Controller", "REST API endpoints de patients", "Spring Boot REST Controller");
             Component patientsQueryController = patientContext.AddComponent("Patients Query Controller", "Permite a los pacientes acceder a su perfil y datos", "Spring Component");
             Component billsCommandController = patientContext.AddComponent("Bills Command Controller", "REST API endpoints de bills", "Spring Boot REST Controller");
@@ -158,9 +158,6 @@ namespace nutrix_c4_model
             Component paymentMethodRepository = patientContext.AddComponent("PaymentMethod Repository", "Información de los payment methods", "Spring Component");
 
             // Tags
-            //patientsController.AddTags("PatientsController");
-            //billsController.AddTags("BillsController");
-            //paymentMethodsController.AddTags("PaymentMethodsController");
             patientsCommandController.AddTags("PatientsCommandController");
             patientsQueryController.AddTags("PatientsQueryController");
             billsCommandController.AddTags("BillsCommandController");
@@ -173,9 +170,6 @@ namespace nutrix_c4_model
             billRepository.AddTags("BillRepository");
             paymentMethodRepository.AddTags("PaymentMethodRepository");
 
-            //styles.Add(new ElementStyle("PatientsController") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
-            //styles.Add(new ElementStyle("BillsController") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
-            //styles.Add(new ElementStyle("PaymentMethodsController") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
             styles.Add(new ElementStyle("PatientsCommandController") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
             styles.Add(new ElementStyle("PatientsQueryController") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
             styles.Add(new ElementStyle("BillsCommandController") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
@@ -188,9 +182,6 @@ namespace nutrix_c4_model
             styles.Add(new ElementStyle("BillRepository") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
             styles.Add(new ElementStyle("PaymentMethodRepository") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
 
-            //apiGateway.Uses(patientsController, "", "JSON/HTTPS");
-            //apiGateway.Uses(billsController, "", "JSON/HTTPS");
-            //apiGateway.Uses(paymentMethodsController, "", "JSON/HTTPS");
             apiGateway.Uses(patientsCommandController, "", "JSON/HTTPS");
             apiGateway.Uses(patientsQueryController, "", "JSON/HTTPS");
             apiGateway.Uses(billsCommandController, "", "JSON/HTTPS");
@@ -199,9 +190,6 @@ namespace nutrix_c4_model
             apiGateway.Uses(paymentMethodsQueryController, "", "JSON/HTTPS");
             webApplication.Uses(apiGateway, "API Request", "JSON/HTTPS");
 
-            //patientsController.Uses(patientsApplicationService, "Invoca métodos de patients", "");
-            //billsController.Uses(patientsApplicationService, "Invoca métodos de bills", "");
-            //paymentMethodsController.Uses(patientsApplicationService, "Invoca métodos de payment methods", "");
             patientsCommandController.Uses(patientsApplicationService, "Invoca métodos de patients", "");
             patientsQueryController.Uses(patientsApplicationService, "Invoca métodos de patients", "");
             billsCommandController.Uses(patientsApplicationService, "Invoca métodos de bills", "");
@@ -219,17 +207,111 @@ namespace nutrix_c4_model
             billRepository.Uses(patientContextDatabase, "", "JDBC");
             paymentMethodRepository.Uses(patientContextDatabase, "", "JDBC");
 
-            ComponentView componentView = viewSet.CreateComponentView(patientContext, "Components", "Component Diagram");
-            componentView.Add(webApplication);
-            componentView.Add(apiGateway);
-            componentView.Add(patientContextDatabase);
-            componentView.Add(niubizAPI);
-            componentView.AddAllComponents();
+            componentViewPatient.Add(webApplication);
+            componentViewPatient.Add(apiGateway);
+            componentViewPatient.Add(patientContextDatabase);
+            componentViewPatient.Add(niubizAPI);
+
+            componentViewPatient.Add(patientsCommandController);
+            componentViewPatient.Add(patientsQueryController);
+            componentViewPatient.Add(billsCommandController);
+            componentViewPatient.Add(billsQueryController);
+            componentViewPatient.Add(paymentMethodsCommandController);
+            componentViewPatient.Add(paymentMethodsQueryController);
+            componentViewPatient.Add(patientsApplicationService);
+            componentViewPatient.Add(patientRepository);
+            componentViewPatient.Add(billRepository);
+            componentViewPatient.Add(paymentMethodRepository);
+            componentViewPatient.Add(domainLayer);
+
+            //4. Diagrama de componentes nutritionist
+
+            ComponentView componentViewNutritionist = viewSet.CreateComponentView(nutritionistContext, "ComponentsNutritionist", "Component Diagram");
+
+            Component nutritionistsCommandController = nutritionistContext.AddComponent("Nutritionists Command Controller", "REST API endpoints de nutritionists", "Spring Boot REST Controller");
+            Component nutritionistsQueryController = nutritionistContext.AddComponent("Nutritionists Query Controller", "Permite a los nutricionistas acceder a su perfil y datos", "Spring Component");
+            Component professionalProfilesCommandController = nutritionistContext.AddComponent("Professional profiles Command Controller", "REST API endpoints de professional profiles", "Spring Boot REST Controller");
+            Component professionalProfilesQueryController = nutritionistContext.AddComponent("Professional profiles Query Controller", "Permite acceder a los datos de professional profiles", "Spring Component");
+            Component specialtiesCommandController = nutritionistContext.AddComponent("Specialties Command Controller", "REST API endpoints de specialties", "Spring Boot REST Controller");
+            Component specialtiesQueryController = nutritionistContext.AddComponent("Specialties Query Controller", "Permite acceder a los datos de specialties", "Spring Component");
+            Component nutritionistsApplicationService = nutritionistContext.AddComponent("Nutritionists Application Service", "Provee métodos para los nutritionists", "Spring Component");
+            Component nutritionistRepository = nutritionistContext.AddComponent("Nutritionist Repository", "Información de los nutritionists", "Spring Component");
+            Component professionalProfileRepository = nutritionistContext.AddComponent("Professional profile Repository", "Información de los professional profiles", "Spring Component");
+            Component specialtyRepository = nutritionistContext.AddComponent("Specialty Repository", "Información de los specialties", "Spring Component");
+            Component domainLayerNutritionist = nutritionistContext.AddComponent("Domain Layer", "", "Spring Component");
+
+            // Tags
+            nutritionistsCommandController.AddTags("NutritionistsCommandController");
+            nutritionistsQueryController.AddTags("NutritionistsQueryController");
+            professionalProfilesCommandController.AddTags("ProfessionalProfilesCommandController");
+            professionalProfilesQueryController.AddTags("ProfessionalProfilesQueryController");
+            specialtiesCommandController.AddTags("SpecialtiesCommandController");
+            specialtiesQueryController.AddTags("SpecialtiesQueryController");
+            nutritionistsApplicationService.AddTags("NutritionistsApplicationService");
+            nutritionistRepository.AddTags("NutritionistRepository");
+            professionalProfileRepository.AddTags("ProfessionalProfileRepository");
+            specialtyRepository.AddTags("SpecialtyRepository");
+            domainLayerNutritionist.AddTags("DomainLayerNutritionist");
+
+            styles.Add(new ElementStyle("NutritionistsCommandController") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            styles.Add(new ElementStyle("NutritionistsQueryController") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            styles.Add(new ElementStyle("ProfessionalProfilesCommandController") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            styles.Add(new ElementStyle("ProfessionalProfilesQueryController") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            styles.Add(new ElementStyle("SpecialtiesCommandController") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            styles.Add(new ElementStyle("SpecialtiesQueryController") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            styles.Add(new ElementStyle("NutritionistsApplicationService") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            styles.Add(new ElementStyle("NutritionistRepository") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            styles.Add(new ElementStyle("ProfessionalProfileRepository") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            styles.Add(new ElementStyle("SpecialtyRepository") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            styles.Add(new ElementStyle("DomainLayerNutritionist") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+
+            apiGateway.Uses(nutritionistsCommandController, "", "JSON/HTTPS");
+            apiGateway.Uses(nutritionistsQueryController, "", "JSON/HTTPS");
+            apiGateway.Uses(professionalProfilesCommandController, "", "JSON/HTTPS");
+            apiGateway.Uses(professionalProfilesQueryController, "", "JSON/HTTPS");
+            apiGateway.Uses(specialtiesCommandController, "", "JSON/HTTPS");
+            apiGateway.Uses(specialtiesQueryController, "", "JSON/HTTPS");
+            webApplication.Uses(apiGateway, "API Request", "JSON/HTTPS");
+
+            nutritionistsCommandController.Uses(nutritionistsApplicationService, "Invoca métodos de nutritionists", "");
+            nutritionistsQueryController.Uses(nutritionistsApplicationService, "Invoca métodos de nutritionists", "");
+            professionalProfilesCommandController.Uses(nutritionistsApplicationService, "Invoca métodos de professional profiles", "");
+            professionalProfilesQueryController.Uses(nutritionistsApplicationService, "Invoca métodos de professional profiles", "");
+            specialtiesCommandController.Uses(nutritionistsApplicationService, "Invoca métodos de specialties", "");
+            specialtiesQueryController.Uses(nutritionistsApplicationService, "Invoca métodos de specialties", "");
+
+            nutritionistsApplicationService.Uses(domainLayerNutritionist, "Usa", "");
+            nutritionistsApplicationService.Uses(nutritionistRepository, "", "JDBC");
+            nutritionistsApplicationService.Uses(professionalProfileRepository, "", "JDBC");
+            nutritionistsApplicationService.Uses(specialtyRepository, "", "JDBC");
+
+            nutritionistRepository.Uses(cnpAPI, "", "JSON/HTTPS");
+            nutritionistRepository.Uses(nutritionistContextDatabase, "", "JDBC");
+            professionalProfileRepository.Uses(nutritionistContextDatabase, "", "JDBC");
+            specialtyRepository.Uses(nutritionistContextDatabase, "", "JDBC");
+
+            componentViewNutritionist.Add(webApplication);
+            componentViewNutritionist.Add(apiGateway);
+            componentViewNutritionist.Add(nutritionistContextDatabase);
+            componentViewNutritionist.Add(cnpAPI);
+
+            componentViewNutritionist.Add(nutritionistsCommandController);
+            componentViewNutritionist.Add(nutritionistsQueryController);
+            componentViewNutritionist.Add(professionalProfilesCommandController);
+            componentViewNutritionist.Add(professionalProfilesQueryController);
+            componentViewNutritionist.Add(specialtiesCommandController);
+            componentViewNutritionist.Add(specialtiesQueryController);
+            componentViewNutritionist.Add(nutritionistsApplicationService);
+            componentViewNutritionist.Add(nutritionistRepository);
+            componentViewNutritionist.Add(professionalProfileRepository);
+            componentViewNutritionist.Add(specialtyRepository);
+            componentViewNutritionist.Add(domainLayerNutritionist);
 
             // Configuraciones de la vista
             contextView.PaperSize = PaperSize.A5_Landscape;
             containerView.PaperSize = PaperSize.A3_Landscape;
-            componentView.PaperSize = PaperSize.A4_Landscape;
+            componentViewPatient.PaperSize = PaperSize.A4_Landscape;
+            componentViewNutritionist.PaperSize = PaperSize.A4_Landscape;
 
             // Actualizar Workspace
             structurizrClient.UnlockWorkspace(workspaceId);

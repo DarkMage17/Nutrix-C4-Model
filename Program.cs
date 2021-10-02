@@ -307,11 +307,77 @@ namespace nutrix_c4_model
             componentViewNutritionist.Add(specialtyRepository);
             componentViewNutritionist.Add(domainLayerNutritionist);
 
+            //5. Diagrama de componentes appointment
+
+            ComponentView componentViewAppointment = viewSet.CreateComponentView(appointmentContext, "ComponentsAppointment", "Component Diagram");
+
+            Component appointmentsCommandController = appointmentContext.AddComponent("Appointments Command Controller", "REST API endpoints de appointments", "Spring Boot REST Controller");
+            Component appointmentsQueryController = appointmentContext.AddComponent("Appointments Query Controller", "Permite acceder a los datos de appointments", "Spring Component");
+            Component dietsCommandController = appointmentContext.AddComponent("Diets Command Controller", "REST API endpoints de diets", "Spring Boot REST Controller");
+            Component dietsQueryController = appointmentContext.AddComponent("Diets Query Controller", "Permite acceder a los datos de diets", "Spring Component");
+            Component appointmentsApplicationService = appointmentContext.AddComponent("Appointments Application Service", "Provee métodos para los appointments", "Spring Component");
+            Component appointmentRepository = appointmentContext.AddComponent("Appointment Repository", "Información de los appointments", "Spring Component");
+            Component dietRepository = appointmentContext.AddComponent("Diet Repository", "Información de las diets", "Spring Component");
+            Component domainLayerAppointment = appointmentContext.AddComponent("Domain Layer", "", "Spring Component");
+
+            // Tags
+            appointmentsCommandController.AddTags("AppointmentsCommandController");
+            appointmentsQueryController.AddTags("AppointmentsQueryController");
+            dietsCommandController.AddTags("DietsCommandController");
+            dietsQueryController.AddTags("DietsQueryController");
+            appointmentsApplicationService.AddTags("AppointmentsApplicationService");
+            appointmentRepository.AddTags("AppointmentRepository");
+            dietRepository.AddTags("DietRepository");
+            domainLayerAppointment.AddTags("DomainLayerAppointment");
+
+            styles.Add(new ElementStyle("AppointmentsCommandController") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            styles.Add(new ElementStyle("AppointmentsQueryController") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            styles.Add(new ElementStyle("DietsCommandController") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            styles.Add(new ElementStyle("DietsQueryController") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            styles.Add(new ElementStyle("AppointmentsApplicationService") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            styles.Add(new ElementStyle("AppointmentRepository") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            styles.Add(new ElementStyle("DietRepository") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            styles.Add(new ElementStyle("DomainLayerAppointment") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+
+            apiGateway.Uses(appointmentsCommandController, "", "JSON/HTTPS");
+            apiGateway.Uses(appointmentsQueryController, "", "JSON/HTTPS");
+            apiGateway.Uses(dietsCommandController, "", "JSON/HTTPS");
+            apiGateway.Uses(dietsQueryController, "", "JSON/HTTPS");
+            webApplication.Uses(apiGateway, "API Request", "JSON/HTTPS");
+
+            appointmentsCommandController.Uses(appointmentsApplicationService, "Invoca métodos de appointments", "");
+            appointmentsQueryController.Uses(appointmentsApplicationService, "Invoca métodos de appointments", "");
+            dietsCommandController.Uses(appointmentsApplicationService, "Invoca métodos de diets", "");
+            dietsQueryController.Uses(appointmentsApplicationService, "Invoca métodos de diets", "");
+
+            appointmentsApplicationService.Uses(domainLayerAppointment, "Usa", "");
+            appointmentsApplicationService.Uses(appointmentRepository, "", "JDBC");
+            appointmentsApplicationService.Uses(dietRepository, "", "JDBC");
+
+            appointmentRepository.Uses(agoraAPI, "", "JSON/HTTPS");
+            appointmentRepository.Uses(appointmentContextDatabase, "", "JDBC");
+            dietRepository.Uses(appointmentContextDatabase, "", "JDBC");
+
+            componentViewAppointment.Add(webApplication);
+            componentViewAppointment.Add(apiGateway);
+            componentViewAppointment.Add(appointmentContextDatabase);
+            componentViewAppointment.Add(agoraAPI);
+
+            componentViewAppointment.Add(appointmentsCommandController);
+            componentViewAppointment.Add(appointmentsQueryController);
+            componentViewAppointment.Add(dietsCommandController);
+            componentViewAppointment.Add(dietsQueryController);
+            componentViewAppointment.Add(appointmentsApplicationService);
+            componentViewAppointment.Add(appointmentRepository);
+            componentViewAppointment.Add(dietRepository);
+            componentViewAppointment.Add(domainLayerAppointment);
+
             // Configuraciones de la vista
             contextView.PaperSize = PaperSize.A5_Landscape;
             containerView.PaperSize = PaperSize.A3_Landscape;
             componentViewPatient.PaperSize = PaperSize.A4_Landscape;
             componentViewNutritionist.PaperSize = PaperSize.A4_Landscape;
+            componentViewAppointment.PaperSize = PaperSize.A4_Landscape;
 
             // Actualizar Workspace
             structurizrClient.UnlockWorkspace(workspaceId);

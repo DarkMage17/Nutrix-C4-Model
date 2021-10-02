@@ -372,12 +372,76 @@ namespace nutrix_c4_model
             componentViewAppointment.Add(dietRepository);
             componentViewAppointment.Add(domainLayerAppointment);
 
+            //6. Diagrama de componentes publications
+
+            ComponentView componentViewPublications = viewSet.CreateComponentView(publicationsContext, "ComponentsPublication", "Component Diagram");
+
+            Component recommendationsCommandController = publicationsContext.AddComponent("Recommendations Command Controller", "REST API endpoints de recommendations", "Spring Boot REST Controller");
+            Component recommendationsQueryController = publicationsContext.AddComponent("Recommendations Query Controller", "Permite acceder a los datos de recommendations", "Spring Component");
+            Component recipesCommandController = publicationsContext.AddComponent("Recipes Command Controller", "REST API endpoints de recipes", "Spring Boot REST Controller");
+            Component recipesQueryController = publicationsContext.AddComponent("Recipes Query Controller", "Permite acceder a los datos de recipes", "Spring Component");
+            Component publicationsApplicationService = publicationsContext.AddComponent("Publications Application Service", "Provee métodos para las publications", "Spring Component");
+            Component recommendationRepository = publicationsContext.AddComponent("Recommendation Repository", "Información de las recommendations", "Spring Component");
+            Component recipeRepository = publicationsContext.AddComponent("Recipe Repository", "Información de las recipes", "Spring Component");
+            Component domainLayerPublication = publicationsContext.AddComponent("Domain Layer", "", "Spring Component");
+
+            // Tags
+            recommendationsCommandController.AddTags("RecommendationsCommandController");
+            recommendationsQueryController.AddTags("RecommendationsQueryController");
+            recipesCommandController.AddTags("RecipesCommandController");
+            recipesQueryController.AddTags("RecipesQueryController");
+            publicationsApplicationService.AddTags("PublicationsApplicationService");
+            recommendationRepository.AddTags("RecommendationRepository");
+            recipeRepository.AddTags("RecipeRepository");
+            domainLayerPublication.AddTags("DomainLayerPublication");
+
+            styles.Add(new ElementStyle("RecommendationsCommandController") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            styles.Add(new ElementStyle("RecommendationsQueryController") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            styles.Add(new ElementStyle("RecipesCommandController") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            styles.Add(new ElementStyle("RecipesQueryController") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            styles.Add(new ElementStyle("PublicationsApplicationService") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            styles.Add(new ElementStyle("RecommendationRepository") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            styles.Add(new ElementStyle("RecipeRepository") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+            styles.Add(new ElementStyle("DomainLayerPublication") { Shape = Shape.Component, Background = "#facc2e", Icon = "" });
+
+            apiGateway.Uses(recommendationsCommandController, "", "JSON/HTTPS");
+            apiGateway.Uses(recommendationsQueryController, "", "JSON/HTTPS");
+            apiGateway.Uses(recipesCommandController, "", "JSON/HTTPS");
+            apiGateway.Uses(recipesQueryController, "", "JSON/HTTPS");
+            webApplication.Uses(apiGateway, "API Request", "JSON/HTTPS");
+
+            recommendationsCommandController.Uses(publicationsApplicationService, "Invoca métodos de recommendations", "");
+            recommendationsQueryController.Uses(publicationsApplicationService, "Invoca métodos de recommendations", "");
+            recipesCommandController.Uses(publicationsApplicationService, "Invoca métodos de recipes", "");
+            recipesQueryController.Uses(publicationsApplicationService, "Invoca métodos de recipes", "");
+
+            publicationsApplicationService.Uses(domainLayerPublication, "Usa", "");
+            publicationsApplicationService.Uses(recommendationRepository, "", "JDBC");
+            publicationsApplicationService.Uses(recipeRepository, "", "JDBC");
+
+            recommendationRepository.Uses(publicationsContextDatabase, "", "JDBC");
+            recipeRepository.Uses(publicationsContextDatabase, "", "JDBC");
+
+            componentViewPublications.Add(webApplication);
+            componentViewPublications.Add(apiGateway);
+            componentViewPublications.Add(publicationsContextDatabase);
+
+            componentViewPublications.Add(recommendationsCommandController);
+            componentViewPublications.Add(recommendationsQueryController);
+            componentViewPublications.Add(recipesCommandController);
+            componentViewPublications.Add(recipesQueryController);
+            componentViewPublications.Add(publicationsApplicationService);
+            componentViewPublications.Add(recommendationRepository);
+            componentViewPublications.Add(recipeRepository);
+            componentViewPublications.Add(domainLayerPublication);
+
             // Configuraciones de la vista
             contextView.PaperSize = PaperSize.A5_Landscape;
             containerView.PaperSize = PaperSize.A3_Landscape;
             componentViewPatient.PaperSize = PaperSize.A4_Landscape;
             componentViewNutritionist.PaperSize = PaperSize.A4_Landscape;
             componentViewAppointment.PaperSize = PaperSize.A4_Landscape;
+            componentViewPublications.PaperSize = PaperSize.A4_Landscape;
 
             // Actualizar Workspace
             structurizrClient.UnlockWorkspace(workspaceId);

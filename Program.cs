@@ -66,11 +66,12 @@ namespace nutrix_c4_model
             Container patientContext = videocallSystem.AddContainer("Patient Context", "Bounded Context del Microservicio de Pacientes", "Spring Boot port 8082");
             Container nutritionistContext = videocallSystem.AddContainer("Nutritionist Context", "Bounded Context del Microservicio de Nutricionistas", "Spring Boot port 8083");
             Container publicationsContext = videocallSystem.AddContainer("Publications Context", "Bounded Context del Microservicio de Publicaciones", "Spring Boot port 8084");
-            Container messageBus = videocallSystem.AddContainer("Bus de Mensajes en Cluster de Alta Disponibilidad", "Transporte de eventos del dominio.", "RabbitMQ");
-            Container appointmentContextDatabase = videocallSystem.AddContainer("Appointment Context DB", "", "PostgreSQL");
-            Container patientContextDatabase = videocallSystem.AddContainer("Patient Context DB", "", "PostgreSQL");
-            Container nutritionistContextDatabase = videocallSystem.AddContainer("Nutritionist Context DB", "", "PostgreSQL");
-            Container publicationsContextDatabase = videocallSystem.AddContainer("Publications Context DB", "", "PostgreSQL");
+            Container messageBus = videocallSystem.AddContainer("Bus de Mensajes", "Transporte de eventos del dominio.", "Spring Cloud Bus");
+            Container appointmentContextDatabase = videocallSystem.AddContainer("Appointment Context DB", "", "MySQL");
+            Container patientContextDatabase = videocallSystem.AddContainer("Patient Context DB", "", "MySQL");
+            Container nutritionistContextDatabase = videocallSystem.AddContainer("Nutritionist Context DB", "", "MySQL");
+            Container publicationsContextDatabase = videocallSystem.AddContainer("Publications Context DB", "", "MySQL");
+            Container eventContextDatabase = videocallSystem.AddContainer("Event Context DB", "", "MySQL");
 
             patient.Uses(webApplication, "Consulta");
             patient.Uses(landingPage, "Consulta");
@@ -87,23 +88,28 @@ namespace nutrix_c4_model
 
             appointmentContext.Uses(messageBus, "Publica y consume eventos del dominio");
             appointmentContext.Uses(appointmentContextDatabase, "", "JDBC");
+            appointmentContext.Uses(eventContextDatabase, "", "JDBC");
             appointmentContext.Uses(agoraAPI, "Permite las videollamadas dentro de la app");
 
             patientContext.Uses(messageBus, "Publica y consume eventos del dominio");
             patientContext.Uses(niubizAPI, "Permite los pagos dentro de la app");
             patientContext.Uses(patientContextDatabase, "", "JDBC");
+            patientContext.Uses(eventContextDatabase, "", "JDBC");
 
             nutritionistContext.Uses(messageBus, "Publica y consume eventos del dominio");
             nutritionistContext.Uses(nutritionistContextDatabase, "", "JDBC");
+            nutritionistContext.Uses(eventContextDatabase, "", "JDBC");
             nutritionistContext.Uses(cnpAPI, "Permite la validación de los datos del nutricionista");
 
             publicationsContext.Uses(messageBus, "Publica y consume eventos del dominio");
             publicationsContext.Uses(publicationsContextDatabase, "", "JDBC");
+            publicationsContext.Uses(eventContextDatabase, "", "JDBC");
 
             // Tags
             webApplication.AddTags("WebApp");
             landingPage.AddTags("LandingPage");
             apiGateway.AddTags("APIGateway");
+            eventContextDatabase.AddTags("EventContextDatabase");
 
             appointmentContext.AddTags("AppointmentContext");
             appointmentContextDatabase.AddTags("AppointmentContextDatabase");
@@ -123,6 +129,7 @@ namespace nutrix_c4_model
             styles.Add(new ElementStyle("WebApp") { Background = "#9d33d6", Color = "#ffffff", Shape = Shape.WebBrowser, Icon = "" });
             styles.Add(new ElementStyle("LandingPage") { Background = "#929000", Color = "#ffffff", Shape = Shape.WebBrowser, Icon = "" });
             styles.Add(new ElementStyle("APIGateway") { Shape = Shape.RoundedBox, Background = "#0000ff", Color = "#ffffff", Icon = "" });
+            styles.Add(new ElementStyle("EventContextDatabase") { Shape = Shape.Cylinder, Background = "#ff0000", Color = "#ffffff", Icon = "" });
 
             styles.Add(new ElementStyle("AppointmentContext") { Shape = Shape.Hexagon, Background = "#facc2e", Icon = "" });
             styles.Add(new ElementStyle("AppointmentContextDatabase") { Shape = Shape.Cylinder, Background = "#ff0000", Color = "#ffffff", Icon = "" });
@@ -197,6 +204,13 @@ namespace nutrix_c4_model
             paymentMethodsCommandController.Uses(patientsApplicationService, "Invoca métodos de payment methods", "");
             paymentMethodsQueryController.Uses(patientsApplicationService, "Invoca métodos de payment methods", "");
 
+            patientsCommandController.Uses(eventContextDatabase, "Escribe en la DB", "");
+            patientsQueryController.Uses(eventContextDatabase, "Escribe en la DB", "");
+            billsCommandController.Uses(eventContextDatabase, "Escribe en la DB", "");
+            billsQueryController.Uses(eventContextDatabase, "Escribe en la DB", "");
+            paymentMethodsCommandController.Uses(eventContextDatabase, "Escribe en la DB", "");
+            paymentMethodsQueryController.Uses(eventContextDatabase, "Escribe en la DB", "");
+
             patientsApplicationService.Uses(domainLayer, "Usa", "");
             patientsApplicationService.Uses(patientRepository, "", "JDBC");
             patientsApplicationService.Uses(billRepository, "", "JDBC");
@@ -210,6 +224,7 @@ namespace nutrix_c4_model
             componentViewPatient.Add(webApplication);
             componentViewPatient.Add(apiGateway);
             componentViewPatient.Add(patientContextDatabase);
+            componentViewPatient.Add(eventContextDatabase);
             componentViewPatient.Add(niubizAPI);
 
             componentViewPatient.Add(patientsCommandController);
@@ -280,6 +295,13 @@ namespace nutrix_c4_model
             specialtiesCommandController.Uses(nutritionistsApplicationService, "Invoca métodos de specialties", "");
             specialtiesQueryController.Uses(nutritionistsApplicationService, "Invoca métodos de specialties", "");
 
+            nutritionistsCommandController.Uses(eventContextDatabase, "Escribe en la DB", "");
+            nutritionistsQueryController.Uses(eventContextDatabase, "Escribe en la DB", "");
+            professionalProfilesCommandController.Uses(eventContextDatabase, "Escribe en la DB", "");
+            professionalProfilesQueryController.Uses(eventContextDatabase, "Escribe en la DB", "");
+            specialtiesCommandController.Uses(eventContextDatabase, "Escribe en la DB", "");
+            specialtiesQueryController.Uses(eventContextDatabase, "Escribe en la DB", "");
+
             nutritionistsApplicationService.Uses(domainLayerNutritionist, "Usa", "");
             nutritionistsApplicationService.Uses(nutritionistRepository, "", "JDBC");
             nutritionistsApplicationService.Uses(professionalProfileRepository, "", "JDBC");
@@ -294,6 +316,7 @@ namespace nutrix_c4_model
             componentViewNutritionist.Add(apiGateway);
             componentViewNutritionist.Add(nutritionistContextDatabase);
             componentViewNutritionist.Add(cnpAPI);
+            componentViewNutritionist.Add(eventContextDatabase);
 
             componentViewNutritionist.Add(nutritionistsCommandController);
             componentViewNutritionist.Add(nutritionistsQueryController);
@@ -350,6 +373,11 @@ namespace nutrix_c4_model
             dietsCommandController.Uses(appointmentsApplicationService, "Invoca métodos de diets", "");
             dietsQueryController.Uses(appointmentsApplicationService, "Invoca métodos de diets", "");
 
+            appointmentsCommandController.Uses(eventContextDatabase, "Escribe en la DB", "");
+            appointmentsQueryController.Uses(eventContextDatabase, "Escribe en la DB", "");
+            dietsCommandController.Uses(eventContextDatabase, "Escribe en la DB", "");
+            dietsQueryController.Uses(eventContextDatabase, "Escribe en la DB", "");
+
             appointmentsApplicationService.Uses(domainLayerAppointment, "Usa", "");
             appointmentsApplicationService.Uses(appointmentRepository, "", "JDBC");
             appointmentsApplicationService.Uses(dietRepository, "", "JDBC");
@@ -362,6 +390,7 @@ namespace nutrix_c4_model
             componentViewAppointment.Add(apiGateway);
             componentViewAppointment.Add(appointmentContextDatabase);
             componentViewAppointment.Add(agoraAPI);
+            componentViewAppointment.Add(eventContextDatabase);
 
             componentViewAppointment.Add(appointmentsCommandController);
             componentViewAppointment.Add(appointmentsQueryController);
@@ -415,6 +444,11 @@ namespace nutrix_c4_model
             recipesCommandController.Uses(publicationsApplicationService, "Invoca métodos de recipes", "");
             recipesQueryController.Uses(publicationsApplicationService, "Invoca métodos de recipes", "");
 
+            recommendationsCommandController.Uses(eventContextDatabase, "Escribe en la DB", "");
+            recommendationsQueryController.Uses(eventContextDatabase, "Escribe en la DB", "");
+            recipesCommandController.Uses(eventContextDatabase, "Escribe en la DB", "");
+            recipesQueryController.Uses(eventContextDatabase, "Escribe en la DB", "");
+
             publicationsApplicationService.Uses(domainLayerPublication, "Usa", "");
             publicationsApplicationService.Uses(recommendationRepository, "", "JDBC");
             publicationsApplicationService.Uses(recipeRepository, "", "JDBC");
@@ -425,6 +459,7 @@ namespace nutrix_c4_model
             componentViewPublications.Add(webApplication);
             componentViewPublications.Add(apiGateway);
             componentViewPublications.Add(publicationsContextDatabase);
+            componentViewPublications.Add(eventContextDatabase);
 
             componentViewPublications.Add(recommendationsCommandController);
             componentViewPublications.Add(recommendationsQueryController);
